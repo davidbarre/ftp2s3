@@ -2,6 +2,7 @@ package s3driver
 
 import (
 	"github.com/awslabs/aws-sdk-go/aws"
+	"github.com/awslabs/aws-sdk-go/aws/credentials"
 	"github.com/koofr/graval"
 )
 
@@ -9,7 +10,7 @@ type S3DriverFactory struct {
 	Username               string
 	Password               string
 	AWSRegion              string
-	AWSCredentialsProvider aws.CredentialsProvider
+	cellarEndpoint         string
 	AWSBucketName          string
 }
 
@@ -18,7 +19,6 @@ func (f *S3DriverFactory) NewDriver() (d graval.FTPDriver, err error) {
 		Username:               f.Username,
 		Password:               f.Password,
 		AWSRegion:              f.AWSRegion,
-		AWSCredentialsProvider: f.AWSCredentialsProvider,
 		AWSBucketName:          f.AWSBucketName,
 	}, nil
 }

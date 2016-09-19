@@ -12,6 +12,8 @@ import (
 
 	"github.com/awslabs/aws-sdk-go/aws"
 	"github.com/awslabs/aws-sdk-go/aws/awsutil"
+	"github.com/awslabs/aws-sdk-go/aws/credentials"
+	"github.com/awslabs/aws-sdk-go/aws/session"
 	"github.com/awslabs/aws-sdk-go/service/s3"
 	"github.com/koofr/graval"
 )
@@ -20,17 +22,20 @@ import (
 type S3Driver struct {
 	Username               string
 	Password               string
+	cellarEndpoint         string
 	AWSRegion              string
-	AWSCredentialsProvider aws.CredentialsProvider
 	AWSBucketName          string
 	WorkingDirectory       string
 }
 
 func (d *S3Driver) s3service() *s3.S3 {
-	svc := s3.New(&aws.Config{
-		Credentials: d.AWSCredentialsProvider,
-		Region:      d.AWSRegion,
-	})
+	sess := session.New()
+	svc := s3.New(sess, aws.NewConfig().WithEndpoint(d.cellarEndpoint))
+
+	//	s3.New(&aws.Config{
+	//	Credentials: d.AWSCredentialsProvider,
+	//	Region:      d.AWSRegion,
+	//})
 	return svc
 }
 
