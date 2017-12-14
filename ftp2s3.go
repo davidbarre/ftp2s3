@@ -5,9 +5,8 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/gebv/ftp2s3-1/s3driver"
 	"github.com/koofr/graval"
-	// "github.com/matiaskorhonen/ftp2s3/s3driver"
+	"github.com/matiaskorhonen/ftp2s3/s3driver"
 
 	"github.com/namsral/flag"
 )
