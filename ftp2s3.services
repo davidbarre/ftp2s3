@@ -1,0 +1,16 @@
+[Unit]
+Description=FTP2S3 daemon
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=forking
+ExecStart=/usr/local/bin/fpt2s3 --config=/usr/local/etc/ftp2s3/myftp.conf
+LimitNOFILE=10000
+TimeoutStartSec=5s
+Restart=on-failure
+RestartSec=15s
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
