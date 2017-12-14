@@ -3,9 +3,12 @@ package main
 import (
 	"log"
 
-	"github.com/awslabs/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/gebv/ftp2s3-1/s3driver"
 	"github.com/koofr/graval"
-	"github.com/matiaskorhonen/ftp2s3/s3driver"
+	// "github.com/matiaskorhonen/ftp2s3/s3driver"
+
 	"github.com/namsral/flag"
 )
 
@@ -38,18 +41,19 @@ func init() {
 }
 
 func main() {
-	// files := map[string]*s3driver.MemoryFile{
-	// 	"/": &s3driver.MemoryFile{graval.NewDirItem(""), nil},
-	// }
-
-	credentialsProvider := aws.Creds(awsAccessKeyID, awsSecretAccessKey, "")
+	creds := credentials.NewStaticCredentials(awsAccessKeyID, awsSecretAccessKey, "")
+	_, err := creds.Get()
+	if err != nil {
+		log.Fatalln("auth aws, ", err)
+	}
+	awsCfg := aws.NewConfig().WithRegion(awsRegion).WithCredentials(creds)
 
 	factory := &s3driver.S3DriverFactory{
-		Username:               username,
-		Password:               password,
-		AWSRegion:              awsRegion,
-		AWSCredentialsProvider: credentialsProvider,
-		AWSBucketName:          awsBucketName,
+		Username:      username,
+		Password:      password,
+		AWSRegion:     awsRegion,
+		AWSCfg:        awsCfg,
+		AWSBucketName: awsBucketName,
 	}
 
 	server := graval.NewFTPServer(&graval.FTPServerOpts{
@@ -70,7 +74,7 @@ func main() {
 	log.Printf("FTP2S3 server listening on %s:%d", host, port)
 	log.Printf("Access: ftp://%s:%s@%s:%d/", username, password, host, port)
 
-	err := server.ListenAndServe()
+	err = server.ListenAndServe()
 
 	if err != nil {
 		log.Fatal(err)

@@ -10,28 +10,25 @@ import (
 	"strings"
 	"time"
 
-	"github.com/awslabs/aws-sdk-go/aws"
-	"github.com/awslabs/aws-sdk-go/aws/awsutil"
-	"github.com/awslabs/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/aws/aws-sdk-go/aws/awsutil"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/koofr/graval"
 )
 
 // S3Driver ...
 type S3Driver struct {
-	Username               string
-	Password               string
-	AWSRegion              string
-	AWSCredentialsProvider aws.CredentialsProvider
-	AWSBucketName          string
-	WorkingDirectory       string
+	Username         string
+	Password         string
+	AWSRegion        string
+	AWSBucketName    string
+	WorkingDirectory string
+	S3               *s3.S3
 }
 
 func (d *S3Driver) s3service() *s3.S3 {
-	svc := s3.New(&aws.Config{
-		Credentials: d.AWSCredentialsProvider,
-		Region:      d.AWSRegion,
-	})
-	return svc
+	return d.S3
 }
 
 func pathToS3PathPrefix(path string) *string {
@@ -55,7 +52,7 @@ func (d *S3Driver) s3DirContents(path string, maxKeys int64, marker string) (*s3
 		Delimiter: aws.String(d.WorkingDirectory),
 		// EncodingType: aws.String("EncodingType"),
 		// Marker:       aws.String("Marker"),
-		MaxKeys: aws.Long(maxKeys),
+		MaxKeys: aws.Int64(maxKeys),
 		Prefix:  prefix,
 	}
 
@@ -65,9 +62,9 @@ func (d *S3Driver) s3DirContents(path string, maxKeys int64, marker string) (*s3
 
 	resp, err := svc.ListObjects(params)
 
-	if awserr := aws.Error(err); awserr != nil {
+	if awserr, ok := err.(awserr.Error); ok {
 		// A service error occurred.
-		fmt.Println("Error: ", awserr)
+		fmt.Println("Error:", awserr.Code(), awserr.Message())
 	} else if err != nil {
 		// A non-service error occurred.
 		panic(err)
@@ -93,9 +90,9 @@ func (d *S3Driver) Bytes(path string) int64 {
 	}
 	resp, err := svc.HeadObject(params)
 
-	if awserr := aws.Error(err); awserr != nil {
+	if awserr, ok := err.(awserr.Error); ok {
 		// A service error occurred.
-		fmt.Println("Error:", awserr.Code, awserr.Message)
+		fmt.Println("Error:", awserr.Code(), awserr.Message())
 		return -1
 	} else if err != nil {
 		// A non-service error occurred.
@@ -118,9 +115,9 @@ func (d *S3Driver) ModifiedTime(path string) (time.Time, bool) {
 	}
 	resp, err := svc.HeadObject(params)
 
-	if awserr := aws.Error(err); awserr != nil {
+	if awserr, ok := err.(awserr.Error); ok {
 		// A service error occurred.
-		fmt.Println("Error:", awserr.Code, awserr.Message)
+		fmt.Println("Error:", awserr.Code(), awserr.Message())
 		return time.Now(), false
 	} else if err != nil {
 		// A non-service error occurred.
@@ -229,9 +226,9 @@ func (d *S3Driver) DeleteFile(path string) bool {
 	}
 	_, err := svc.DeleteObject(params)
 
-	if awserr := aws.Error(err); awserr != nil {
+	if awserr, ok := err.(awserr.Error); ok {
 		// A service error occurred.
-		fmt.Println("Error:", awserr.Code, awserr.Message)
+		fmt.Println("Error:", awserr.Code(), awserr.Message())
 		return false
 	} else if err != nil {
 		// A non-service error occurred.
@@ -264,9 +261,9 @@ func (d *S3Driver) GetFile(path string, position int64) (io.ReadCloser, bool) {
 	}
 	resp, err := svc.GetObject(params)
 
-	if awserr := aws.Error(err); awserr != nil {
+	if awserr, ok := err.(awserr.Error); ok {
 		// A service error occurred.
-		fmt.Println("Error:", awserr.Code, awserr.Message)
+		fmt.Println("Error:", awserr.Code(), awserr.Message())
 		return nil, false
 	} else if err != nil {
 		// A non-service error occurred.
@@ -308,9 +305,9 @@ func (d *S3Driver) PutFile(path string, reader io.Reader) bool {
 	}
 	resp, err := svc.PutObject(params)
 
-	if awserr := aws.Error(err); awserr != nil {
+	if awserr, ok := err.(awserr.Error); ok {
 		// A service error occurred.
-		fmt.Println("Error:", awserr.Code, awserr.Message)
+		fmt.Println("Error:", awserr.Code(), awserr.Message())
 		return false
 	} else if err != nil {
 		// A non-service error occurred.
