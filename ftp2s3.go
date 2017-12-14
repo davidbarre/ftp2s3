@@ -11,6 +11,8 @@ import (
 	"github.com/namsral/flag"
 )
 
+var VERSION = "dev"
+
 var host string
 var port int
 var username string
@@ -40,6 +42,8 @@ func init() {
 }
 
 func main() {
+	log.Println("VERSION", VERSION)
+
 	creds := credentials.NewStaticCredentials(awsAccessKeyID, awsSecretAccessKey, "")
 	_, err := creds.Get()
 	if err != nil {
