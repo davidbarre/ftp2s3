@@ -10,8 +10,8 @@
 [[projects]]
   name = "github.com/aws/aws-sdk-go"
   packages = ["aws","aws/awserr","aws/awsutil","aws/client","aws/client/metadata","aws/corehandlers","aws/credentials","aws/credentials/ec2rolecreds","aws/credentials/endpointcreds","aws/credentials/stscreds","aws/defaults","aws/ec2metadata","aws/endpoints","aws/request","aws/session","aws/signer/v4","internal/shareddefaults","private/protocol","private/protocol/query","private/protocol/query/queryutil","private/protocol/rest","private/protocol/restxml","private/protocol/xml/xmlutil","service/s3","service/sts"]
-  revision = "ed448bf2aa437d03a95b925a17f7ed5380353559"
-  version = "v1.12.47"
+  revision = "25ef42b41b82230caae56ab23d872c81fb5c0eae"
+  version = "v1.12.46"
 
 [[projects]]
   name = "github.com/go-ini/ini"
@@ -64,7 +64,7 @@
   branch = "master"
   name = "github.com/matiaskorhonen/ftp2s3"
   packages = ["s3driver"]
-  revision = "ad7b48d5885ba4966b0c51f5147646095e08401e"
+  revision = "dc49395d2d65e8551a1f5884660e5753f14487b9"
   source = "github.com/gebv/ftp2s3-1"
 
 [[projects]]
