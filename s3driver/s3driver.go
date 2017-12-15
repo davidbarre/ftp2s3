@@ -299,11 +299,12 @@ func (d *S3Driver) PutFile(path string, reader io.Reader) bool {
 
 	acl := s3.ObjectCannedACLPublicRead
 	params := &s3.PutObjectInput{
-		ACL:         &acl,
-		Bucket:      aws.String(d.AWSBucketName), // Required
-		Key:         aws.String(path),            // Required
-		Body:        bytes.NewReader(buf.Bytes()),
-		ContentType: aws.String(contentType),
+		ACL:           &acl,
+		Bucket:        aws.String(d.AWSBucketName), // Required
+		Key:           aws.String(path),            // Required
+		Body:          bytes.NewReader(buf.Bytes()),
+		ContentLength: aws.Int64(int64(buf.Len())),
+		ContentType:   aws.String(contentType),
 	}
 	resp, err := svc.PutObject(params)
 
